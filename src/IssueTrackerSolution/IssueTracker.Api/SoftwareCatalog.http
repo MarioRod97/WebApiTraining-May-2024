@@ -1,0 +1,18 @@
+# For more info on HTTP files go to https://aka.ms/vs/httpfile
+@apiUrl=https://localhost:1338
+
+# Members of the Software Center can add new items to our catalog of supported software.
+# We have a "COLLECTION" of supported software, and we want to APPEND a new subordinate resource (DOCUMENT) to that collection.
+
+POST {{apiUrl}}/catalog
+Content-Type: application/json
+
+{
+  "title": "Visual Studio Code",
+  "description": "Editor for Developers and Data Analysts"
+}
+
+
+###
+
+GET {{apiUrl}}/catalog
