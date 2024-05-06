@@ -5,6 +5,16 @@ using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddAuthentication().AddJwtBearer(); // the services that let us use the [Authorize] attribute
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("IsSoftwareAdmin", policy =>
+    {
+        policy.RequireRole("SoftwareCenter");
+    });
+});
+
 // Add services to the container.
 
 builder.Services.AddControllers().AddJsonOptions(options =>
@@ -34,8 +44,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+
 app.UseAuthorization(); // come back to this.
 
 app.MapControllers(); // create the call sheet.
 
 app.Run(); // start the process and block here waiting for request.
+
+public partial class Program { }

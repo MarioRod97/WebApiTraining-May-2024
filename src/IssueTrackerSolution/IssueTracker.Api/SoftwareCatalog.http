@@ -1,10 +1,15 @@
 # For more info on HTTP files go to https://aka.ms/vs/httpfile
 @apiUrl=https://localhost:1338
 
+@ordinaryUserToken=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IklUVVN0dWRlbnQiLCJzdWIiOiJJVFVTdHVkZW50IiwianRpIjoiNWJjYmJhYzIiLCJhdWQiOlsiaHR0cDovL2xvY2FsaG9zdDo0MzQ2NyIsImh0dHBzOi8vbG9jYWxob3N0OjQ0MzY4IiwiaHR0cDovL2xvY2FsaG9zdDoxMzM3IiwiaHR0cHM6Ly9sb2NhbGhvc3Q6MTMzOCJdLCJuYmYiOjE3MTUwMjUxNjQsImV4cCI6MTcyMjk3Mzk2NCwiaWF0IjoxNzE1MDI1MTY2LCJpc3MiOiJkb3RuZXQtdXNlci1qd3RzIn0.3zPjPoosqM5tVjdstDRPOFbOz5WmXrcvmyv7QScCx6g
+
+@softwareCenterUserToken=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6InN1ZUBhb2wuY29tIiwic3ViIjoic3VlQGFvbC5jb20iLCJqdGkiOiI0ZTcxYTllIiwicm9sZSI6WyJTb2Z0d2FyZUNlbnRlciIsIkJvc3MiXSwiYXVkIjpbImh0dHA6Ly9sb2NhbGhvc3Q6NDM0NjciLCJodHRwczovL2xvY2FsaG9zdDo0NDM2OCIsImh0dHA6Ly9sb2NhbGhvc3Q6MTMzNyIsImh0dHBzOi8vbG9jYWxob3N0OjEzMzgiXSwibmJmIjoxNzE1MDI2MDA3LCJleHAiOjE4MDk2MzQwMDcsImlhdCI6MTcxNTAyNjAwNywiaXNzIjoiZG90bmV0LXVzZXItand0cyJ9.zZF_mlqN_U_5gc1olneuSrxN_hPHEMixl-wEzn_FJdw
+
 # Members of the Software Center can add new items to our catalog of supported software.
 # We have a "COLLECTION" of supported software, and we want to APPEND a new subordinate resource (DOCUMENT) to that collection.
 
 POST {{apiUrl}}/catalog
+Authorization: {{ordinaryUserToken}}
 Content-Type: application/json
 
 {
@@ -16,3 +21,11 @@ Content-Type: application/json
 ###
 
 GET {{apiUrl}}/catalog
+Authorization: {{ordinaryUserToken}}
+
+###
+
+GET {{apiUrl}}/catalog/0ac853e4-728d-4e44-ba19-e8262a56f918
+Authorization: {{ordinaryUserToken}}
+
+###
