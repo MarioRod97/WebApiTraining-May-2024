@@ -1,0 +1,6 @@
+# For more info on HTTP files go to https://aka.ms/vs/httpfile
+@IssueTracker.Api_HostAddress = https://localhost:1338
+
+GET {{IssueTracker.Api_HostAddress}}/catalog
+
+###
