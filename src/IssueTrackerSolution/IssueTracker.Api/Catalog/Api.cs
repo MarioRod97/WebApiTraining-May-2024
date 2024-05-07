@@ -3,7 +3,6 @@ using Marten;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using static IssueTracker.Api.Catalog.Entities;
 
 namespace IssueTracker.Api.Catalog;
 
@@ -13,6 +12,7 @@ namespace IssueTracker.Api.Catalog;
 public class Api(IValidator<CreateCatalogItemRequest> validator, IDocumentSession session) : ControllerBase
 {
     [HttpGet]
+    [ResponseCache(Duration = 5, Location = ResponseCacheLocation.Client)]
     public async Task<ActionResult> GetAllCatalogItemsAsync(CancellationToken token)
     {
         var data = await session.Query<CatalogItem>()
@@ -23,7 +23,7 @@ public class Api(IValidator<CreateCatalogItemRequest> validator, IDocumentSessio
     }
 
     [HttpPost]
-    [Authorize(Roles = "SoftwareCenter")]
+    [Authorize(Roles = "IsSoftwareAdmin")]
     public async Task<ActionResult> AddACatalogItemAsync([FromBody] CreateCatalogItemRequest request,
         CancellationToken token)
     {
@@ -36,7 +36,7 @@ public class Api(IValidator<CreateCatalogItemRequest> validator, IDocumentSessio
             return this.CreateProblemDetailsForModelValidation("Cannot Add Catalog Item", validation.ToDictionary());
         }
 
-        var entityToSave = new CatalogItem(Guid.NewGuid(), request.Title, request.Description, userId!, DateTimeOffset.Now);
+        var entityToSave = request.MapToCatalogItem(userId);
 
         session.Store(entityToSave);
 
@@ -50,13 +50,13 @@ public class Api(IValidator<CreateCatalogItemRequest> validator, IDocumentSessio
         // and what are we going to return.
         // return to them, from the entity, the thing we are giving them as the "reciept"
 
-        var response = new CatalogItemResponse(entityToSave.Id, request.Title, request.Description);
+        var response = entityToSave.MapToResponse();
 
-        return Ok(response); // I have stored this thing in such a way that you can get it again, it is now
-                             // part of this collection.
+        return CreatedAtRoute("catalog#get-by-id", new { id = response.Id }, response); // I have stored this thing in such a way that you can get it again, it is now
+                                                                                        // part of this collection.
     }
 
-    [HttpGet("{id:guid}")]
+    [HttpGet("{id:guid}", Name = "catalog#get-by-id")]
     public async Task<ActionResult> GetCatalogItemByIdAsync(Guid id, CancellationToken token)
     {
         var response = await session.Query<CatalogItem>()

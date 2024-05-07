@@ -20,7 +20,8 @@ public class CatalogTests
         var response = await host.Scenario(api =>
         {
             api.Post.Json(itemToAdd).ToUrl("/catalog");
-            api.StatusCodeShouldBeOk();
+            api.StatusCodeShouldBe(201);
+            api.Header("Location").SingleValueShouldMatch("http://localhost/catalog/*.");
         });
 
         var actualResponse = await response.ReadAsJsonAsync<CatalogItemResponse>();

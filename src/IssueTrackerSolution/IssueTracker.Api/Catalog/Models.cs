@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Riok.Mapperly.Abstractions;
 
 namespace IssueTracker.Api.Catalog;
 
@@ -7,11 +8,38 @@ namespace IssueTracker.Api.Catalog;
 
 public record CreateCatalogItemRequest(string Title, string Description);
 
+public static class ModelExtensions
+{
+    //public static CatalogItemResponse MapToResponse(this CatalogItem item)
+    //{
+    //    return new CatalogItemResponse(item.Id, item.Title, item.Description);
+    //}
+
+    public static CatalogItem MapToCatalogItem(this CreateCatalogItemRequest request, string addedBy)
+    {
+        return new CatalogItem
+        {
+            Id = Guid.NewGuid(),
+            Description = request.Description,
+            Title = request.Title,
+            AddedBy = addedBy,
+            CreatedAt = DateTimeOffset.Now
+        };
+    }
+}
+
+[Mapper]
+public static partial class CatalogMappers
+{
+    public static partial CatalogItem MapToResponse(this CatalogItem item);
+}
+
 public class CreateCatalogItemRequestValidator : AbstractValidator<CreateCatalogItemRequest>
 {
     public CreateCatalogItemRequestValidator()
     {
-        RuleFor(r => r.Title).NotEmpty().MinimumLength(5).MaximumLength(256);
+        RuleFor(r => r.Title).NotEmpty().WithMessage("We need a title");
+        RuleFor(r => r.Title).MinimumLength(5).MaximumLength(256).WithMessage("Has to be between 5 and 256 characters");
         RuleFor(r => r.Description).NotEmpty().MaximumLength(1024);
     }
 }
