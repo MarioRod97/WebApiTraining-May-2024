@@ -4,14 +4,14 @@ using System.Security.Claims;
 
 namespace IssueTracker.Api.Catalog;
 
-public class ShouldBeCreatorToDeleteCatalogItemRequirement : IAuthorizationRequirement
+public class ShouldBeCreatorToAlterCatalogItemRequirement : IAuthorizationRequirement
 {
 }
 
 public class
-    ShouldBeCreatorOfCatalogItemRequirementHandler(IQuerySession session, IHttpContextAccessor httpContext) : AuthorizationHandler<ShouldBeCreatorToDeleteCatalogItemRequirement>
+    ShouldBeCreatorOfCatalogItemRequirementHandler(IQuerySession session, IHttpContextAccessor httpContext) : AuthorizationHandler<ShouldBeCreatorToAlterCatalogItemRequirement>
 {
-    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, ShouldBeCreatorToDeleteCatalogItemRequirement requirement)
+    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, ShouldBeCreatorToAlterCatalogItemRequirement requirement)
     {
 
         if (httpContext.HttpContext is null)
@@ -19,7 +19,7 @@ public class
             return;
         }
 
-        if (httpContext.HttpContext.Request.Method == "DELETE")
+        if (httpContext.HttpContext.Request.Method == "DELETE" || httpContext.HttpContext.Request.Method == "PUT")
         {
             if (httpContext.HttpContext.Request.RouteValues["id"] is string routeParamId)
             {

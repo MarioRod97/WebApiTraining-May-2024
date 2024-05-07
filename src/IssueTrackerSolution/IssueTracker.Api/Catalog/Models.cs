@@ -45,3 +45,17 @@ public class CreateCatalogItemRequestValidator : AbstractValidator<CreateCatalog
 }
 
 public record CatalogItemResponse(Guid Id, string Title, string Description);
+
+public record ReplaceCatalogItemRequest(Guid id, string Title, string Description);
+
+public class CatalogItemResponseValidator : AbstractValidator<ReplaceCatalogItemRequest>
+{
+    public CatalogItemResponseValidator()
+    {
+        RuleFor(r => r.id).NotEmpty();
+        RuleFor(r => r.Title).NotEmpty().WithMessage("We need a title");
+
+        RuleFor(r => r.Title).MinimumLength(5).MaximumLength(256).WithMessage("Has to be between 5 and 256 characters");
+        RuleFor(r => r.Description).NotEmpty().MaximumLength(1024);
+    }
+}

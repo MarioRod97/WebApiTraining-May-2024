@@ -61,4 +61,31 @@ public class ApiCommands(IValidator<CreateCatalogItemRequest> validator, IDocume
 
         return NoContent();
     }
+
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult> ReplaceCatalogItemAsync(Guid id, [FromBody] ReplaceCatalogItemRequest request, CancellationToken token)
+    {
+        var item = await session.LoadAsync<CatalogItem>(id);
+
+        if (item is null)
+        {
+            return NotFound(0); // or do an upstart?
+        }
+
+        // I'd also validate the id in the request matches the route id, but you do you.
+
+        if (id != request.id)
+        {
+            return BadRequest("Ids don't match");
+        }
+
+        item.Title = request.Title;
+        item.Description = request.Description;
+
+        session.Store(item);
+
+        await session.SaveChangesAsync();
+
+        return Ok();
+    }
 }
