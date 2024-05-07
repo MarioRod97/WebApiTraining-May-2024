@@ -11,4 +11,5 @@ public class CatalogItem
     public string Description { get; set; } = string.Empty;
     public string AddedBy { get; set; } = string.Empty;
     public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset? RemovedAt { get; set; } = null;
 }

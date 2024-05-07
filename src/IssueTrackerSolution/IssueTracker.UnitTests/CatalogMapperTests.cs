@@ -10,7 +10,7 @@ public class CatalogMapperTests
 
         var mappedResponse = entity.MapToResponse();
 
-        Assert.Equal("stuff", mappedResponse.Title);
+        Assert.Equal("Stuff", mappedResponse.Title);
         Assert.Equal("rad", mappedResponse.Description);
         Assert.Equal(entity.Id, mappedResponse.Id);
     }
