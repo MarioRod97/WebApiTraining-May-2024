@@ -11,6 +11,7 @@ namespace IssueTracker.Api.Catalog;
 public class ApiCommands(IValidator<CreateCatalogItemRequest> validator, IDocumentSession session) : ControllerBase
 {
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<ActionResult> AddACatalogItemAsync([FromBody] CreateCatalogItemRequest request,
         CancellationToken token)
     {
@@ -27,15 +28,7 @@ public class ApiCommands(IValidator<CreateCatalogItemRequest> validator, IDocume
 
         session.Store(entityToSave);
 
-        await session.SaveChangesAsync(); // Do the actual work!
-
-        // get the JSON data they sent and look at it. Is it cool?
-        // If not, send them an error (400, with some details)
-        // if it is cool, maybe save it to a database or something?
-        // we have to create the entity to save the request, and add it to the database, etc.
-        // save it.
-        // and what are we going to return.
-        // return to them, from the entity, the thing we are giving them as the "reciept"
+        await session.SaveChangesAsync(token); // Do the actual work!
 
         var response = entityToSave.MapToResponse();
 
@@ -44,7 +37,7 @@ public class ApiCommands(IValidator<CreateCatalogItemRequest> validator, IDocume
     }
 
     [HttpDelete("{id:guid}")]
-    public async Task<ActionResult> RemoveCatalogItemsAsync(Guid id)
+    public async Task<ActionResult> RemoveCatalogItemsAsync(Guid id, CancellationToken token)
     {
         var storedItem = await session.LoadAsync<CatalogItem>(id);
 
@@ -56,7 +49,7 @@ public class ApiCommands(IValidator<CreateCatalogItemRequest> validator, IDocume
 
             session.Store(storedItem); // "Upsert"
 
-            await session.SaveChangesAsync(); // save it
+            await session.SaveChangesAsync(token); // save it
         }
 
         return NoContent();
@@ -84,7 +77,7 @@ public class ApiCommands(IValidator<CreateCatalogItemRequest> validator, IDocume
 
         session.Store(item);
 
-        await session.SaveChangesAsync();
+        await session.SaveChangesAsync(token);
 
         return Ok();
     }
