@@ -2,16 +2,29 @@
 using Marten;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Claims;
 
 namespace IssueTracker.Api.Catalog;
 
 [Authorize(Policy = "IsSoftwareAdmin")]
 [Route("/catalog")]
+[Produces("application/json")]
+[ApiExplorerSettings(GroupName = "Software Catalog")]
 public class ApiCommands(IValidator<CreateCatalogItemRequest> validator, IDocumentSession session) : ControllerBase
 {
+    /// <summary>
+    /// Add an Item to the Software Catalog
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    /// <response code="201">The new software item</response>
+    /// <response code="400">A application/problems+json response</response>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [SwaggerOperation(Tags = ["Software Catalog"], OperationId = "AddCatalog")]
     public async Task<ActionResult> AddACatalogItemAsync([FromBody] CreateCatalogItemRequest request,
         CancellationToken token)
     {
@@ -37,6 +50,7 @@ public class ApiCommands(IValidator<CreateCatalogItemRequest> validator, IDocume
     }
 
     [HttpDelete("{id:guid}")]
+    [SwaggerOperation(Tags = ["Software Catalog"])]
     public async Task<ActionResult> RemoveCatalogItemsAsync(Guid id, CancellationToken token)
     {
         var storedItem = await session.LoadAsync<CatalogItem>(id);
@@ -56,6 +70,7 @@ public class ApiCommands(IValidator<CreateCatalogItemRequest> validator, IDocume
     }
 
     [HttpPut("{id:guid}")]
+    [SwaggerOperation(Tags = ["Software Catalog"], OperationId = "Replace")]
     public async Task<ActionResult> ReplaceCatalogItemAsync(Guid id, [FromBody] ReplaceCatalogItemRequest request, CancellationToken token)
     {
         var item = await session.LoadAsync<CatalogItem>(id);
