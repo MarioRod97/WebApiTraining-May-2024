@@ -10,26 +10,44 @@ public class Api(UserIdentityService userIdentityService, IDocumentSession sessi
 {
     [HttpPost("/catalog/{id:guid}/issues")]
     [SwaggerOperation(Tags = ["Issues", "Software Catalog"])]
-    public async Task<ActionResult<UserIssueResponse>> AddAnIssueAsync(Guid Id, [FromBody] UserCreateIssueRequestModel request)
+    public async Task<ActionResult<UserIssueResponse>> AddAnIssueAsync(Guid Id, [FromBody] UserCreateIssueRequestModel request, CancellationToken token)
     {
-        var softwareExists = await session.Query<CatalogItem>().Where(c => c.Id == Id).AnyAsync();
+        var software = await session.Query<CatalogItem>()
+            .Where(c => c.Id == Id)
+            .Select(c => new IssueSoftwareEmbeddedResponse(c.Id, c.Title, c.Description))
+            .SingleOrDefaultAsync();
 
-        if (!softwareExists)
+        if (software is null)
         {
             return NotFound("No software found with that Id in the catalog.");
         }
 
         var userInfo = await userIdentityService.GetUserInformationAsync();
 
-        var fakeResponse = new UserIssueResponse
+        var userUrl = Url.RouteUrl("users#get-by-id", new { id = userInfo.Id }) ?? throw new Exception("Need a User URL");
+
+        var entity = new UserIssue
         {
             Id = Guid.NewGuid(),
             Status = IssueStatusTypes.Submitted,
-            User = "/users/" + userInfo.Id,
-            Software = new IssueSoftwareEmbeddedResponse(Id, "Fake Title", "Fake Description")
+            User = userUrl,
+            Software = software,
+            Created = DateTimeOffset.Now
         };
 
-        return Ok(fakeResponse);
+        session.Store<UserIssue>(entity);
+
+        await session.SaveChangesAsync(token);
+
+        var response = new UserIssueResponse
+        {
+            Id = entity.Id,
+            Status = entity.Status,
+            User = entity.User,
+            Software = entity.Software
+        };
+
+        return Ok(response);
     }
 }
 
@@ -39,6 +57,15 @@ public record UserIssueResponse
 {
     public Guid Id { get; set; }
     public string User { get; set; } = string.Empty;
+    public IssueSoftwareEmbeddedResponse? Software { get; set; }
+    public IssueStatusTypes Status { get; set; } = IssueStatusTypes.Submitted;
+}
+
+public record UserIssue
+{
+    public Guid Id { get; set; }
+    public string User { get; set; } = string.Empty;
+    public DateTimeOffset Created { get; set; }
     public IssueSoftwareEmbeddedResponse? Software { get; set; }
     public IssueStatusTypes Status { get; set; } = IssueStatusTypes.Submitted;
 }
