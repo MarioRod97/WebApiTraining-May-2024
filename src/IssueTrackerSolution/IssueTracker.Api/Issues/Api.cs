@@ -8,6 +8,18 @@ namespace IssueTracker.Api.Issues;
 
 public class Api(UserIdentityService userIdentityService, IDocumentSession session) : ControllerBase
 {
+    [HttpGet("/issues")]
+    [SwaggerOperation(Tags = ["Issues"])]
+    public async Task<ActionResult> GetIssuesAsync(CancellationToken token, [FromQuery] IssueStatusTypes stats)
+    {
+        //var data = await session.Query<UserIssue>();
+
+        return Ok(new
+        {
+            filteringBy = stats,
+        }); // query and map all the issues
+    }
+
     [HttpPost("/catalog/{id:guid}/issues")]
     [SwaggerOperation(Tags = ["Issues", "Software Catalog"])]
     public async Task<ActionResult<UserIssueResponse>> AddAnIssueAsync(Guid Id, [FromBody] UserCreateIssueRequestModel request, CancellationToken token)
